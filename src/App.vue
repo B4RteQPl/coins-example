@@ -1,27 +1,60 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <div v-if="!isLoading && coins.length">
+    <CoinList :coins="coins"/>
+  </div>
 </template>
 
-<script lang="ts">
+<script>
 import { defineComponent } from 'vue'
-import HelloWorld from './components/HelloWorld.vue'
+import CoinList from './components/CoinList.vue'
+import CoinpaprikaAPI from '@coinpaprika/api-nodejs-client'
 
 export default defineComponent({
   name: 'App',
   components: {
-    HelloWorld
+    CoinList
+  },
+  data () {
+    return {
+      coins: [],
+      isLoading: false
+    }
+  },
+  async mounted () {
+    await this.fetchCoins()
+  },
+  methods: {
+    // todo move it to client class
+    async fetchCoins () {
+      this.isLoading = true
+
+      const client = new CoinpaprikaAPI()
+
+      return client.getAllTickers({
+        quotes: ['USD', 'BTC', 'ETH']
+      })
+        .then(this.onFetchCoinsSuccess)
+        .catch(this.onFetchCoinsError)
+        .finally(this.onFetchCoinsFinish)
+    },
+
+    onFetchCoinsSuccess (coins) {
+      this.coins = coins
+    },
+
+    onFetchCoinsError (error) {
+      console.log(error)
+    },
+
+    onFetchCoinsFinish () {
+      this.isLoading = false
+    }
   }
 })
 </script>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  body {
+    background: #dcdcdc;
+  }
 </style>
