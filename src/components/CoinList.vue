@@ -46,7 +46,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import { defineComponent } from 'vue'
 import CoinItem from './CoinItem.vue'
 import Button from './Button.vue'
